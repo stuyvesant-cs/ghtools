@@ -4,6 +4,7 @@ import os
 import sys
 import requests
 from dotenv import load_dotenv
+import time
 
 def setup_repositories(csv_file, org_name, base_repo, github_token):
     """
@@ -22,18 +23,17 @@ def setup_repositories(csv_file, org_name, base_repo, github_token):
         return
 
     # Test if the token can read the repo first
-    test_url = f"https://github.com/{org_name}/{base_repo}"
-    test_response = requests.get(test_url, headers=headers)
-
-    if test_response.status_code == 200:
-        print("Authentication successful! The repo is visible.")
-    elif test_response.status_code == 404:
-        print("The repo cannot be found. Check your token permissions or repo spelling.")
-    else:
-        print(f"Error {test_response.status_code}: {test_response.text}")
-    #=== END TEST
-
+    # test_url = f"https://github.com/{org_name}/{base_repo}"
+    # test_response = requests.get(test_url, headers=headers)
+    #
+    # if test_response.status_code == 200:
+    #     print("Authentication successful! The repo is visible.")
+    # elif test_response.status_code == 404:
+    #     print("The repo cannot be found. Check your token permissions or repo spelling.")
+    # else:
+    #     print(f"Error {test_response.status_code}: {test_response.text}")
     #sys.exit(1)
+    #=== END TEST
 
     with open(csv_file, mode='r', encoding='utf-8') as f:
         reader = csv.reader(f)
@@ -64,7 +64,10 @@ def setup_repositories(csv_file, org_name, base_repo, github_token):
             # print(f'url: {fork_url}')
 
             if create_response.status_code == 202:
-                print(f"  [SUCCESS] Repository '{repo_name}' created.")
+                print(f"\t ✅ [SUCCESS] Repository '{repo_name}' created.")
+
+                #give gh some time to create the fork
+                time.sleep(2)
 
                 # 2. Invite the user as a collaborator (push permission = editor)
                 invite_url = f"{base_url}/repos/{org_name}/{repo_name}/collaborators/{username}"
@@ -73,14 +76,14 @@ def setup_repositories(csv_file, org_name, base_repo, github_token):
                 invite_response = requests.put(invite_url, json=invite_payload, headers=headers)
 
                 if invite_response.status_code in [201, 204]:
-                    print(f"  [SUCCESS] Invited '{username}' to '{repo_name}'.")
+                    print(f"\t ✅ [SUCCESS] Invited '{username}' to '{repo_name}'.")
                 else:
-                    print(f"  [ERROR] Failed to invite {username}: {invite_response.json().get('message', 'Unknown error')}")
+                    print(f"  [ERROR] Failed to invite {username}: {invite_response.json().get('message', 'Unknown error')}\n {invite_response.status_code}\n{invite_response.json()}")
             elif create_response.status_code == 422:
-                print(f"  [SKIP] Repository '{repo_name}' already exists or invalid name.")
+                print(f"\t ❌ [SKIP] Repository '{repo_name}' already exists or invalid name.")
             else:
                 error_msg = create_response.json().get('message', 'Unknown error')
-                print(f"  [ERROR] Failed to create repo: {error_msg}")
+                print(f"\t ❌ [ERROR] Failed to create repo: {error_msg}")
 
 if __name__ == "__main__":
     if len(sys.argv) < 4:

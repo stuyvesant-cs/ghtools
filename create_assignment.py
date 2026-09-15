@@ -78,7 +78,7 @@ def setup_repositories(csv_file, org_name, base_repo, github_token):
                 if invite_response.status_code in [201, 204]:
                     print(f"\t ✅ [SUCCESS] Invited '{username}' to '{repo_name}'.")
                 else:
-                    print(f"  [ERROR] Failed to invite {username}: {invite_response.json().get('message', 'Unknown error')}\n {invite_response.status_code}\n{invite_response.json()}")
+                    print(f"\t ❌ [ERROR] Failed to invite {username}: {invite_response.json().get('message', 'Unknown error')}")
             elif create_response.status_code == 422:
                 print(f"\t ❌ [SKIP] Repository '{repo_name}' already exists or invalid name.")
             else:

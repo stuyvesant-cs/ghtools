@@ -95,11 +95,15 @@ if __name__ == "__main__":
     organization = sys.argv[2]
     base_repo = sys.argv[3]
     load_dotenv()
-    token = os.getenv("GITHUB_TOKEN")
+
+    token_name = organization.replace('-', '_').upper()+"_TOKEN"
+    token = os.getenv(token_name)
 
     if not token:
         print("Error: GITHUB_TOKEN environment variable is not set.")
         sys.exit(1)
+
+    sys.exit(1);
 
     print('ready to go')
     #sys.exit()

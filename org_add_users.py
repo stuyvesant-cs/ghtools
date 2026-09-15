@@ -68,7 +68,9 @@ if __name__ == "__main__":
     csv_path = sys.argv[1]
     organization = sys.argv[2]
     load_dotenv()
-    token = os.getenv("GITHUB_TOKEN")
+
+    token_name = organization.replace('-', '_').upper()+"_TOKEN"
+    token = os.getenv(token_name)
 
     if not token:
         print("Error: GITHUB_TOKEN environment variable is not set.")

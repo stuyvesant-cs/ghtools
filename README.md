@@ -28,6 +28,9 @@ In order to use the create_assignment tool, you will need to create a Personal A
     - Metatdata: Read-only (this gets turned on automatically)
   - Organizations:
     - Members: Read-only (Read & Write is needed for the org_add_users tool)
+  - As written, this program uses python's `dotenv` module to read in tokens forma  file called `.env`. The program assumes the token is stored as `ORG_NAME_TOKEN`. For example:
+    - `APCS_DW_TOKEN=alkdjsfniuahf87932hr89jiuihf87y3f43r`
+    - The program will generate the token name based on the `org_name` provided as a command line argument. It will capitalize all letters and replace any `-` characters with `_`.
 When making the token, make sure you are in the organization context, as opposed to your personal GitHub account.
 
 ### Permissions

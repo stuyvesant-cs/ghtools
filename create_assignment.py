@@ -103,8 +103,6 @@ if __name__ == "__main__":
         print("Error: GITHUB_TOKEN environment variable is not set.")
         sys.exit(1)
 
-    sys.exit(1);
-
     print('ready to go')
     #sys.exit()
     setup_repositories(csv_path, organization, base_repo, token)

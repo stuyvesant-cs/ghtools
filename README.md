@@ -1,7 +1,6 @@
 # ghtools
 Command line utilities to help replace some of the lost features of GitHub Classroom.
 
---
 
 ## create_assignment.py
 Usage: `python create_assignent.py <csv_file> <org_name> <repo_name>`
@@ -16,7 +15,7 @@ Usage: `python org_add_users.py <csv_file> <org_name>`
 
 Will add all users in `csv_file` to `org_name`. As it stands, it assumes the csv file is the same format as the file for `create_assignment`, notably that means a period column is present on each row, even if the period is not used.
 
---
+
 ## Tokens & Permissions
 ### Tokens
 In order to use the create_assignment tool, you will need to create a Personal Access Token. GitHub suggests a fine-grained token with the following settings

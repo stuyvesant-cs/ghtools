@@ -45,7 +45,7 @@ def setup_repositories(csv_file, org_name, base_repo, github_token):
 
             class_id = row[0].strip()
             username = row[1].strip()
-            repo_name = f"{class_id}-{username}-work"
+            repo_name = f"{class_id}-{username}-{base_repo}"
 
             print(f"Processing: {repo_name}...")
 

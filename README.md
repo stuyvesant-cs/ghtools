@@ -66,6 +66,10 @@ Now looking at my template repo ( https://github.com/fcs251/exhaust_tmplt/settin
 Methinks if I turn on the former, the latter will light up. Investigating...
 
 
+* * *
+
+2min later:
+AHA YES! Checking box for "Allow forking of private and internal repositories" reveals the radiobuttons from which I chose "User accounts and organizations within this enterprise"  -- and when I returned to template repo settings, "Allow forking" is not only no longer greyed out but also ALREADY CHECKED!
 
 
 

@@ -58,6 +58,14 @@ If enabled, forking is allowed on private, internal, and public repositories. If
 
 ...which seems like maybe the same setting, under a different guise?
 
+* * *
+Updt 5min later:
+Now looking at my template repo ( https://github.com/fcs251/exhaust_tmplt/settings )
+...I see the "Allow forking" option is greyed-out. Checkbox uncheckable.
+
+Methinks if I turn on the former, the latter will light up. Investigating...
+
+
 
 
 

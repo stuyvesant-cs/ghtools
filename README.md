@@ -42,3 +42,22 @@ There are two places where you need to ensure permissions are correct:
   - Under Settings --> General --> Features
     - Select **Allow forking**
   - If you want the student repositories to be private, the template repository must be private as well.
+
+
+
+* * *
+
+
+some notes from TM:
+When I go to 
+https://github.com/organizations/fcs251/settings/member_privileges
+...and look at the Repository Forking section, there is only this:
+
+[CHECKBOX] Allow forking of private and internal repositories
+If enabled, forking is allowed on private, internal, and public repositories. If disabled, forking is only allowed on public repositories. This setting is also configurable per-repository.
+
+...which seems like maybe the same setting, under a different guise?
+
+
+
+

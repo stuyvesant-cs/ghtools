@@ -11,9 +11,10 @@ Will create repositories forked off an assignment repository and invite students
 - Assumes there is a file `.env` containing the appropriate github access token (see Tokens & Permissions below).
 
 ## org_add_users.py
-Usage: `python org_add_users.py <csv_file> <org_name>`
+Usage: `python org_add_users [-h] [-f FILE | -i INDIVIDUAL] org_name`
 
-Will add all users in `csv_file` to `org_name`. As it stands, it assumes the csv file is the same format as the file for `create_assignment`, notably that means a period column is present on each row, even if the period is not used.
+- If `-f` flag is used, adds all users in `FILE` to `org_name`. As it stands, it assumes the csv file is the same format as the file for `create_assignment`, notably that means a period column is present on each row, even if the period is not used.
+- If `-i` flag is used, will add the GitHub username `INDIVIDUAL` to the org.
 
 
 ## Tokens & Permissions
@@ -49,7 +50,7 @@ There are two places where you need to ensure permissions are correct:
 
 
 some notes from TM:
-When I go to 
+When I go to
 https://github.com/organizations/fcs251/settings/member_privileges
 ...and look at the Repository Forking section, there is only this:
 
@@ -76,5 +77,3 @@ AHA YES! Checking box for "Allow forking of private and internal repositories" r
 
 PATs at
 https://github.com/settings/personal-access-tokens/new
-
-

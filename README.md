@@ -3,7 +3,7 @@ Command line utilities to help replace some of the lost features of GitHub Class
 
 
 ## create_assignment.py
-Usage: `python create_assignent.py <csv_file> <org_name> <repo_name>`
+Usage: `python org_add_users [-h] [-f FILE | -i INDIVIDUAL INDIVIDUAL] org_name repo_name`
 
 Will create repositories forked off an assignment repository and invite students to have write access to the new fork.
 - This version assumes that the assignment template and the created student repositories are all in the same organization (`org_name`)

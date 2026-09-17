@@ -73,3 +73,8 @@ AHA YES! Checking box for "Allow forking of private and internal repositories" r
 
 
 
+
+PATs at
+https://github.com/settings/personal-access-tokens/new
+
+

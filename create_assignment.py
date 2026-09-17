@@ -124,6 +124,7 @@ def create_fork(org_name, base_repo, class_id, username, github_token):
         print(f"\t ❌ [SKIP] Repository '{repo_name}' already exists or invalid name.")
         return True
     elif create_response.status_code == 403:
+        error_msg = create_response.json().get('message', 'Unknown error')
         print(f"\t ❌ [SKIP] Repository '{repo_name}' {create_response.status_code} {error_msg}")
         return True
     else:

@@ -59,7 +59,7 @@ def create_team(org_name, team_name, headers, base_url):
         print(f"❌ [ERROR] Failed to create team: {response.status_code} {error_msg}")
 
 
-def add_repos(csv_file, org_name, headers, base_url):
+def modify_repos(csv_file, org_name, headers, base_url, remove=False):
     """
     Reads a CSV file and creates GitHub repositories in an organization,
     then invites the specified users as collaborators.
@@ -80,7 +80,10 @@ def add_repos(csv_file, org_name, headers, base_url):
             team_name = row[0].strip()
             #print(f"Processing: {username}...")
 
-            add_repo_to_team(repo_name, org_name, team_name, headers, base_url)
+            if remove:
+                remove_repo_from_team(repo_name, org_name, team_name, headers, base_url)
+            else:
+                add_repo_to_team(repo_name, org_name, team_name, headers, base_url)
 
 def add_repo_to_team(repo_name, org_name, team_name, headers, base_url, permission='pull'):
     invite_url = f"{base_url}/orgs/{org_name}/teams/{team_name}/repos/{org_name}/{repo_name}"
@@ -95,6 +98,16 @@ def add_repo_to_team(repo_name, org_name, team_name, headers, base_url, permissi
         error_msg = response.json().get('message', 'Unknown error')
         print(f"❌ [ERROR] Failed to add {repo_name} {response.status_code} {error_msg}")
 
+def remove_repo_from_team(repo_name, org_name, team_name, headers, base_url):
+    invite_url = f"{base_url}/orgs/{org_name}/teams/{team_name}/repos/{org_name}/{repo_name}"
+    #print(invite_url)
+    response = requests.delete(invite_url, headers=headers)
+    if response.status_code == 204:
+        print(f"✅ [SUCCESS] removed {repo_name} from {team_name}")
+    else:
+        error_msg = response.json().get('message', 'Unknown error')
+        print(f"❌ [ERROR] Failed to remove {repo_name} {response.status_code} {error_msg}")
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
@@ -107,6 +120,7 @@ if __name__ == "__main__":
 
     action_arg_group.add_argument('-r', '--add_repo', action='store_true')
     action_arg_group.add_argument('-t', '--add_team', action='store_true')
+    action_arg_group.add_argument('-D', '--delete_repo', action='store_true')
 
     parser.add_argument('-c', '--only_create', action='store_true')
     parser.add_argument('org_name')
@@ -131,8 +145,8 @@ if __name__ == "__main__":
     }
     base_url = "https://api.github.com"
 
-    if not (args.only_create or args.add_repo or args.add_team):
-        print('please provide -c, -r, or -t option')
+    if not (args.only_create or args.add_repo or args.add_team or args.delete_repo):
+        print('please provide -c, -r, -D, or -t option')
         sys.exit(1)
     if args.only_create:
         #print(organization, team, headers, base_url)
@@ -148,9 +162,14 @@ if __name__ == "__main__":
     elif args.add_team:
         if args.file:
             csv_path = args.file
-            add_users(csv_path, organization, headers, base_url)
+            modify_repos(csv_path, organization, headers, base_url)
         elif args.individual:
             username = args.individual
-            #create_team(organization, team, headers, base_url)
             add_user_to_team(username, organization, team, headers, base_url)
-            #add_user(username, organization, token)
+    elif args.delete_repo:
+        if args.file:
+            csv_path = args.file
+            modify_repos(csv_path, organization, headers, base_url, True)
+        elif args.individual:
+            repo = args.individual
+            remove_repo_from_team(repo, organization, team, headers, base_url)

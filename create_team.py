@@ -7,53 +7,42 @@ from dotenv import load_dotenv
 import time
 import argparse
 
-# def add_users(csv_file, org_name, github_token):
-#     """
-#     Reads a CSV file and creates GitHub repositories in an organization,
-#     then invites the specified users as collaborators.
-#     """
-#     # headers = {
-#     #     "Authorization": f"token {github_token}",
-#     #     "Accept": "application/vnd.github.v3+json",
-#     #     "X-GitHub-Api-Version": "2026-03-10"
-#     # }
-#     # base_url = "https://api.github.com"
-#
-#     if not os.path.exists(csv_file):
-#         print(f"Error: File '{csv_file}' not found.")
-#         return
-#
-#     with open(csv_file, mode='r', encoding='utf-8') as f:
-#         reader = csv.reader(f)
-#         for row in reader:
-#
-#             if not row or len(row) < 2:
-#                 print(f'Invalid row: {row}')
-#                 continue
-#
-#             #class_id = row[0].strip()
-#             username = row[1].strip()
-#             #user_id = 0
-#
-#             print(f"Processing: {username}...")
-#
-#             add_user(username, org_name, github_token)
+def add_users(csv_file, org_name, headers, base_url):
+    """
+    Reads a CSV file and creates GitHub repositories in an organization,
+    then invites the specified users as collaborators.
+    """
+
+    if not os.path.exists(csv_file):
+        print(f"Error: File '{csv_file}' not found.")
+        return
+
+    with open(csv_file, mode='r', encoding='utf-8') as f:
+        reader = csv.reader(f)
+        for row in reader:
+
+            if not row or len(row) < 2:
+                print(f'Invalid row: {row}')
+                continue
+            username = row[1].strip()
+            team_name = row[0].strip()
+            print(f"Processing: {username}...")
+
+            add_user_to_team(username, org_name, team_name, headers, base_url)
 
 def add_user_to_team(username, org_name, team_name, headers, base_url):
 
-    create_url = f"{base_url}/orgs/{org_name}/teams/{team_name}/memberships/{username}"
+    invite_url = f"{base_url}/orgs/{org_name}/teams/{team_name}/memberships/{username}"
     payload = {
         'role': 'member'
     }
-    print(create_url)
-    response = requests.post(create_url, json=payload, headers=headers)
-    if response.status_code == 201:
-        print(f"\t ✅ [SUCCESS] added {username}")
+    #print(invite_url)
+    response = requests.put(invite_url, json=payload, headers=headers)
+    if response.status_code == 200:
+        print(f"✅ [SUCCESS] added {username} to {team_name}")
     else:
         error_msg = response.json().get('message', 'Unknown error')
-        print(f"❌ [ERROR] Failed to add {username} {error_msg}\n\t{response.json()}")
-
-
+        print(f"❌ [ERROR] Failed to add {username} {response.status_code} {error_msg}")
 
 def create_team(org_name, team_name, headers, base_url):
     create_url = f"{base_url}/orgs/{org_name}/teams"
@@ -64,20 +53,62 @@ def create_team(org_name, team_name, headers, base_url):
 
     response = requests.post(create_url, json=payload, headers=headers)
     if response.status_code == 201:
-        print(f" ✅ [SUCCESS] {team_name} created.")
+        print(f"✅ [SUCCESS] {team_name} created.")
     else:
         error_msg = response.json().get('message', 'Unknown error')
-        print(f"❌ [ERROR] Failed to create team: {error_msg}\n\t{response.json()}")
+        print(f"❌ [ERROR] Failed to create team: {response.status_code} {error_msg}")
+
+
+def add_repos(csv_file, org_name, headers, base_url):
+    """
+    Reads a CSV file and creates GitHub repositories in an organization,
+    then invites the specified users as collaborators.
+    """
+
+    if not os.path.exists(csv_file):
+        print(f"Error: File '{csv_file}' not found.")
+        return
+
+    with open(csv_file, mode='r', encoding='utf-8') as f:
+        reader = csv.reader(f)
+        for row in reader:
+
+            if not row or len(row) < 2:
+                print(f'Invalid row: {row}')
+                continue
+            repo_name = row[1].strip()
+            team_name = row[0].strip()
+            #print(f"Processing: {username}...")
+
+            add_repo_to_team(repo_name, org_name, team_name, headers, base_url)
+
+def add_repo_to_team(repo_name, org_name, team_name, headers, base_url, permission='pull'):
+    invite_url = f"{base_url}/orgs/{org_name}/teams/{team_name}/repos/{org_name}/{repo_name}"
+    payload = {
+        'permission': permission
+    }
+    #print(invite_url)
+    response = requests.put(invite_url, json=payload, headers=headers)
+    if response.status_code == 204:
+        print(f"✅ [SUCCESS] added {repo_name} to {team_name}")
+    else:
+        error_msg = response.json().get('message', 'Unknown error')
+        print(f"❌ [ERROR] Failed to add {repo_name} {response.status_code} {error_msg}")
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
                     prog='org_add_users',
                     description='Add users to a GitHub Organization')
-    arg_group = parser.add_mutually_exclusive_group()
-    arg_group.add_argument('-f', '--file')
-    arg_group.add_argument('-i', '--individual')
-    arg_group.add_argument('-c', '--only_create', action='store_true')
+    input_arg_group = parser.add_mutually_exclusive_group()
+    action_arg_group = parser.add_mutually_exclusive_group()
+    input_arg_group.add_argument('-f', '--file')
+    input_arg_group.add_argument('-i', '--individual')
+
+    action_arg_group.add_argument('-r', '--add_repo', action='store_true')
+    action_arg_group.add_argument('-t', '--add_team', action='store_true')
+
+    parser.add_argument('-c', '--only_create', action='store_true')
     parser.add_argument('org_name')
     parser.add_argument('team_name')
 
@@ -100,18 +131,26 @@ if __name__ == "__main__":
     }
     base_url = "https://api.github.com"
 
-    if not (args.file or args.individual or args.only_create):
-        print('please provide -c, -f or -i option')
+    if not (args.only_create or args.add_repo or args.add_team):
+        print('please provide -c, -r, or -t option')
         sys.exit(1)
-    elif args.only_create:
+    if args.only_create:
         #print(organization, team, headers, base_url)
         #sys.exit(1)
         create_team(organization, team, headers, base_url)
-    elif args.file:
-        csv_path = args.file
-        #add_users(csv_path, organization, token)
-    elif args.individual:
-        username = args.individual
-        create_team(organization, team, headers, base_url)
-        add_user_to_team(username, organization, team, headers, base_url)
-        #add_user(username, organization, token)
+    if args.add_repo:
+        if args.file:
+            csv_path = args.file
+            add_repos(csv_path, organization, headers, base_url)
+        elif args.individual:
+            repo = args.individual
+            add_repo_to_team(repo, organization, team, headers, base_url)
+    elif args.add_team:
+        if args.file:
+            csv_path = args.file
+            add_users(csv_path, organization, headers, base_url)
+        elif args.individual:
+            username = args.individual
+            #create_team(organization, team, headers, base_url)
+            add_user_to_team(username, organization, team, headers, base_url)
+            #add_user(username, organization, token)

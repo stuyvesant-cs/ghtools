@@ -7,12 +7,19 @@ from dotenv import load_dotenv
 import time
 import argparse
 
-def add_users(csv_file, org_name, headers, base_url):
-    """
-    Reads a CSV file and creates GitHub repositories in an organization,
-    then invites the specified users as collaborators.
-    """
+def send_request(request_method, url_string, payload, token):
+    headers = {
+        "Authorization": f"token {token}",
+        "Accept": "application/vnd.github.v3+json",
+        "X-GitHub-Api-Version": "2026-03-10"
+    }
+    base_url = "https://api.github.com"
 
+    url = f'{base_url}{url_string}'
+    response = request_method(url, json=payload, headers=headers)
+    return response
+
+def add_users(csv_file, org_name, token):
     if not os.path.exists(csv_file):
         print(f"Error: File '{csv_file}' not found.")
         return
@@ -28,30 +35,39 @@ def add_users(csv_file, org_name, headers, base_url):
             team_name = row[0].strip()
             print(f"Processing: {username}...")
 
-            add_user_to_team(username, org_name, team_name, headers, base_url)
+            add_user_to_team(username, org_name, team_name, token)
 
-def add_user_to_team(username, org_name, team_name, headers, base_url):
-
-    invite_url = f"{base_url}/orgs/{org_name}/teams/{team_name}/memberships/{username}"
+def add_user_to_team(username, org_name, team_name, token):
+    invite_url = f"/orgs/{org_name}/teams/{team_name}/memberships/{username}"
     payload = {
         'role': 'member'
     }
-    #print(invite_url)
-    response = requests.put(invite_url, json=payload, headers=headers)
+
+    response = send_request(requests.put, invite_url, payload, token)
     if response.status_code == 200:
         print(f"✅ [SUCCESS] added {username} to {team_name}")
     else:
         error_msg = response.json().get('message', 'Unknown error')
         print(f"❌ [ERROR] Failed to add {username} {response.status_code} {error_msg}")
 
-def create_team(org_name, team_name, headers, base_url):
-    create_url = f"{base_url}/orgs/{org_name}/teams"
+def remove_user_from_team(username, org_name, team_name, token):
+    invite_url = f"/orgs/{org_name}/teams/{team_name}/memberships/{username}"
 
+    response = send_request(requests.delete, invite_url, None, token)
+    if response.status_code == 204:
+        print(f"✅ [SUCCESS] removed {username} from {team_name}")
+    else:
+        error_msg = response.json().get('message', 'Unknown error')
+        print(f"❌ [ERROR] Failed to remove {username} {response.status_code} {error_msg}")
+
+def create_team(org_name, team_name, token):
+    create_url = f"/orgs/{org_name}/teams"
     payload = {
         'name': team_name
     }
 
-    response = requests.post(create_url, json=payload, headers=headers)
+    #response = requests.post(create_url, json=payload, headers=headers)
+    response = send_request(requests.post, create_url, payload, token)
     if response.status_code == 201:
         print(f"✅ [SUCCESS] {team_name} created.")
     else:
@@ -59,12 +75,7 @@ def create_team(org_name, team_name, headers, base_url):
         print(f"❌ [ERROR] Failed to create team: {response.status_code} {error_msg}")
 
 
-def modify_repos(csv_file, org_name, headers, base_url, remove=False):
-    """
-    Reads a CSV file and creates GitHub repositories in an organization,
-    then invites the specified users as collaborators.
-    """
-
+def modify_repos(csv_file, org_name, token, remove=False):
     if not os.path.exists(csv_file):
         print(f"Error: File '{csv_file}' not found.")
         return
@@ -81,27 +92,28 @@ def modify_repos(csv_file, org_name, headers, base_url, remove=False):
             #print(f"Processing: {username}...")
 
             if remove:
-                remove_repo_from_team(repo_name, org_name, team_name, headers, base_url)
+                remove_repo_from_team(repo_name, org_name, team_name, token)
             else:
-                add_repo_to_team(repo_name, org_name, team_name, headers, base_url)
+                add_repo_to_team(repo_name, org_name, team_name,token)
 
-def add_repo_to_team(repo_name, org_name, team_name, headers, base_url, permission='pull'):
-    invite_url = f"{base_url}/orgs/{org_name}/teams/{team_name}/repos/{org_name}/{repo_name}"
+def add_repo_to_team(repo_name, org_name, team_name, token, permission='pull'):
+    invite_url = f"/orgs/{org_name}/teams/{team_name}/repos/{org_name}/{repo_name}"
     payload = {
         'permission': permission
     }
-    #print(invite_url)
-    response = requests.put(invite_url, json=payload, headers=headers)
+    #response = requests.put(invite_url, json=payload, headers=headers)
+    response = send_request(requests.put, invite_url, payload, token)
     if response.status_code == 204:
         print(f"✅ [SUCCESS] added {repo_name} to {team_name}")
     else:
         error_msg = response.json().get('message', 'Unknown error')
         print(f"❌ [ERROR] Failed to add {repo_name} {response.status_code} {error_msg}")
 
-def remove_repo_from_team(repo_name, org_name, team_name, headers, base_url):
-    invite_url = f"{base_url}/orgs/{org_name}/teams/{team_name}/repos/{org_name}/{repo_name}"
+def remove_repo_from_team(repo_name, org_name, team_name, token):
+    invite_url = f"/orgs/{org_name}/teams/{team_name}/repos/{org_name}/{repo_name}"
     #print(invite_url)
-    response = requests.delete(invite_url, headers=headers)
+    #response = requests.delete(invite_url, headers=headers)
+    response = send_request(requests.delete, invite_url, None, token)
     if response.status_code == 204:
         print(f"✅ [SUCCESS] removed {repo_name} from {team_name}")
     else:
@@ -165,7 +177,8 @@ if __name__ == "__main__":
             modify_repos(csv_path, organization, headers, base_url)
         elif args.individual:
             username = args.individual
-            add_user_to_team(username, organization, team, headers, base_url)
+            #add_user_to_team(username, organization, team, token)
+            remove_user_from_team(username, organization, team, token)
     elif args.delete_repo:
         if args.file:
             csv_path = args.file

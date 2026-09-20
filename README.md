@@ -2,6 +2,27 @@
 Command line utilities to help replace some of the lost features of GitHub Classroom.
 
 
+# INPUT MODIFICATION CURRENTLY IN PROGRESS.
+Moving to a different style of program invocation, in order to combine these tools under one umbrella. This is the desired end goal:
+```
+ghtool
+├── assignment
+│   └── create
+├── org
+│   └── users
+│       └── add
+└── team
+    ├── create
+    ├── delete
+    ├── repos
+    │   ├── add
+    │   └── delete
+    └── users
+        ├── add
+        └── delete
+```
+As of now, the `org` and `team` options have been folded into `ghtool`. `create_assignment` still works standalone as described.
+
 ## create_assignment.py
 Usage: `python org_add_users [-h] [-f FILE | -i INDIVIDUAL INDIVIDUAL] org_name repo_name`
 
@@ -10,11 +31,42 @@ Will create repositories forked off an assignment repository and invite students
 - The `csv_file` assumes each line is the follwoing format: `PERIOD,GH_USERNAME` (e.g. `10,jonalf`). The created repositories will be named `PERIOD-GH_USERNAME`.
 - Assumes there is a file `.env` containing the appropriate github access token (see Tokens & Permissions below).
 
-## org_add_users.py
-Usage: `python org_add_users [-h] [-f FILE | -i INDIVIDUAL] org_name`
+## ghtool.py
+Usage: `python ghtool.py org|team`
 
+### `ghtool.py org`
+Actions: `users add [-i USER | -f FILE] org_name`
 - If `-f` flag is used, adds all users in `FILE` to `org_name`. As it stands, it assumes the csv file is the same format as the file for `create_assignment`, notably that means a period column is present on each row, even if the period is not used.
-- If `-i` flag is used, will add the GitHub username `INDIVIDUAL` to the org.
+- If `-i` flag is used, will add the GitHub username `USER` to the org.
+
+### `ghtool.py team`
+Actions: `team create|delete|repos|users`
+
+#### `create`
+Usage: `ghtool.py team create TEAM ORG`
+- Add `TEAM` to `ORG`
+
+#### `delete`
+Usage: `ghtool.py team delete TEAM ORG`
+- Remove `TEAM` from `ORG`
+
+#### `repos`
+Usage `ghtool.py team repos add -i REPO TEAM | -f FILE ORG`
+- The options for `add` and `delete` are the same.
+  - `add` will give a team __pull__ access to a repo.
+  - `delete` will remove a team as a contributor to a repo.
+- If `-i` flag is used, `TEAM` will be added to `REPO`.
+- If `-f` flag is used, `FILE` will be parsed, assuming each line is formatted as `TEAM,REPO`. The teams in the file do not need to be the same.
+
+#### `users`
+Usage `ghtool.py team users add -i USER TEAM | -f FILE ORG`
+- The options for `add` and `delete` are the same.
+  - `add` will add a user to a team.
+  - `delete` will remove a user from a tram.
+- If `-i` flag is used, `USER` will be added to `TEAM`.
+- If `-f` flag is used, `FILE` will be parsed, assuming each line is formatted as `TEAM,USER`. The teams in the file do not need to be the same.
+
+
 
 
 ## Tokens & Permissions

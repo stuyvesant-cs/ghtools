@@ -1,5 +1,6 @@
 import argparse
 import manage_teams
+import manage_org
 from dotenv import load_dotenv
 import os
 import sys
@@ -116,6 +117,7 @@ def create_parser():
         "org",
         metavar="ORG",
         help="GitHub organization")
+    org_users_add_parser.set_defaults(func=manage_org.org_operation)
 
     # =========================================================
     # TEAM

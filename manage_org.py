@@ -6,6 +6,14 @@ from dotenv import load_dotenv
 import time
 import argparse
 
+def org_operation(args):
+    #print(args)
+    if args.org_command == 'users' and args.users_command == 'add':
+        if args.file:
+            add_users(args.file, args.org, args.token)
+        else:
+            add_user(args.username, args.org, args.token)
+
 def add_users(csv_file, org_name, github_token):
 
     if not os.path.exists(csv_file):

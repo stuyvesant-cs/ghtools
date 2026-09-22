@@ -1,6 +1,7 @@
 import argparse
 import manage_teams
 import manage_org
+import create_assignment
 from dotenv import load_dotenv
 import os
 import sys
@@ -51,6 +52,33 @@ def parse_team_repo_args(args, parser):
             parser.error("when using -f/--file, only ORG should be provided")
 
         args.team = None
+        args.org = args.arguments[0]
+
+    del args.arguments
+
+#===========================
+#  WIP
+#===========================
+def parse_assignment_args(args, parser):
+    """
+    Normalize the positional arguments for:
+        assignment create
+
+    -i PERIOD USERNAME ORG REPO
+    -f FILE ORG REPO
+    """
+    if args.user is not None:
+        if len(args.arguments) != 2:
+            parser.error("when using -i/--user, PERIOD USERNAME is required")
+
+        args.period = args.user
+        args.user = args.arguments[0]
+        args.org = args.arguments[1]
+
+    elif args.file is not None:
+        if len(args.arguments) != 1:
+            parser.error("when using -f/--file, only FILENAME is required")
+
         args.org = args.arguments[0]
 
     del args.arguments
@@ -314,6 +342,57 @@ def create_parser():
         help="TEAM ORG when using -i; ORG when using -f")
     team_repos_delete_parser.set_defaults(func=manage_teams.repo_operations)
 
+    # =========================================================
+    # ASSIGNMENT
+    # =========================================================
+    assignment_parser = top_subparsers.add_parser(
+        "assignment",
+        help="Assignment operations")
+
+    assignment_subparsers = assignment_parser.add_subparsers(
+        dest="assignment_command",
+        required=True)
+
+    # ---------------------------------------------------------
+    # Assignment CREATE
+    # ---------------------------------------------------------
+    assignment_create_parser = assignment_subparsers.add_parser(
+        "create",
+        help="Create an assignment")
+    assignment_create_input = (
+        assignment_create_parser.add_mutually_exclusive_group(
+            required=True))
+
+    assignment_create_input.add_argument(
+        "-i",
+        "--user",
+        metavar="user",
+        help="Period and Username to add")
+
+    assignment_create_input.add_argument(
+        "-f",
+        "--file",
+        metavar="FILE",
+        help="File containing period/username information")
+
+    assignment_create_parser.add_argument(
+        "arguments",
+        nargs="+",
+        metavar="ARG",
+        help="PERIOD USERNAME ORG when using -i; ORG when using -f")
+
+    team_create_parser.add_argument(
+        "org",
+        metavar="ORG",
+        help="GitHub organization")
+
+    assignment_create_parser.add_argument(
+        "repo",
+        metavar="REPO",
+        help="Repository name")
+
+    assignment_create_parser.set_defaults(func=create_assignment.assignment_operation)
+
     return parser
 
 
@@ -334,6 +413,12 @@ def main():
         and args.team_command == "repos"
         and (args.repos_command in ("add", "delete"))):
         parse_team_repo_args(args, parser)
+    if (
+        args.command == "assignment"
+        and args.assignment_command == "create"):
+        parse_assignment_args(args, parser)
+
+    print(args)
 
     load_dotenv()
     token_name = args.org.replace('-', '_').upper()+"_TOKEN"

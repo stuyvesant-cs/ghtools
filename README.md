@@ -32,7 +32,15 @@ Will create repositories forked off an assignment repository and invite students
 - Assumes there is a file `.env` containing the appropriate github access token (see Tokens & Permissions below).
 
 ## ghtool.py
-Usage: `python ghtool.py org|team`
+Usage: `python ghtool.py assignment|org|team`
+- Assumes there is a file `.env` containing the appropriate github access token (see Tokens & Permissions below).
+
+### `ghtool.py assignment`
+Actions: `create [-i PERIOD USER | -f FILE] org_name base_repo`
+- Will create repositories forked off `base_repo` and invite students to have write access to the new fork.
+- Assumes that the assignment template and the created student repositories are all in the same organization (`org_name`)
+- The `csv_file` assumes each line is the follwoing format: `PERIOD,GH_USERNAME` (e.g. `10,jonalf`). The created repositories will be named `PERIOD-GH_USERNAME`.
+
 
 ### `ghtool.py org`
 Actions: `users add [-i USER | -f FILE] org_name`

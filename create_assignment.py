@@ -11,8 +11,8 @@ def assignment_operation(args):
     if args.file:
         setup_repositories(args.file, args.org, args.repo, args.token)
     else:
-        create_fork(args.org, args.base_repo, args.period, args.user, args.token)
-        invite_user(args.org, args.base_repo, args.period, args.user, args.token)
+        create_fork(args.org, args.repo, args.period, args.user, args.token)
+        invite_user(args.org, args.repo, args.period, args.user, args.token)
 
 def test_repo_access(org_name, base_repo, github_token):
     headers = {

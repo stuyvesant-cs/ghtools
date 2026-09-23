@@ -7,6 +7,8 @@ from dotenv import load_dotenv
 import time
 import argparse
 
+TEMPLATE_SUFFIX = ['-template', '-base']
+
 def assignment_operation(args):
     if args.file:
         setup_repositories(args.file, args.org, args.repo, args.token)
@@ -62,43 +64,10 @@ def setup_repositories(csv_file, org_name, base_repo, github_token):
             print(f"Processing: {username}...")
             fork_success = create_fork(org_name, base_repo, class_id, username, github_token)
 
-            # # 1. Create the repository in the organization
-            # #create_url = f"{base_url}/orgs/{org_name}/repos"
-            # fork_url = f"{base_url}/repos/{org_name}/{base_repo}/forks"
-            # payload = {
-            #     "name": repo_name,
-            #     "private": True,  # Set to False if you want public repositories
-            #     "organization": org_name #ADDED BY ME
-            # }
-            #
-            # create_response = requests.post(fork_url, json=payload, headers=headers)
-            #
-            # # print(f'payload: {payload}')
-            # # print(f'url: {fork_url}')
-            #
-            # if create_response.status_code == 202:
-            #     print(f"\t ✅ [SUCCESS] Repository '{repo_name}' created.")
-
-            #give gh some time to create the fork
             time.sleep(2)
 
             if  fork_success:
                 invite_user(org_name, base_repo, class_id, username, github_token)
-                # # 2. Invite the user as a collaborator (push permission = editor)
-                # invite_url = f"{base_url}/repos/{org_name}/{repo_name}/collaborators/{username}"
-                # invite_payload = {"permission": "push"}
-                #
-                # invite_response = requests.put(invite_url, json=invite_payload, headers=headers)
-                #
-                # if invite_response.status_code in [201, 204]:
-                #     print(f"\t ✅ [SUCCESS] Invited '{username}' to '{repo_name}'.")
-                # else:
-                #     print(f"\t ❌ [ERROR] Failed to invite {username}: {invite_response.json().get('message', 'Unknown error')}")
-        # elif create_response.status_code == 422:
-            #     print(f"\t ❌ [SKIP] Repository '{repo_name}' already exists or invalid name.")
-            # else:
-            #     error_msg = create_response.json().get('message', 'Unknown error')
-            #     print(f"\t ❌ [ERROR] Failed to create repo: {error_msg}")
 
 def create_fork(org_name, base_repo, class_id, username, github_token):
     headers = {
@@ -108,7 +77,10 @@ def create_fork(org_name, base_repo, class_id, username, github_token):
     }
     base_url = "https://api.github.com"
 
-    repo_name = f"{class_id}-{username}-{base_repo.replace('-template', '')}"
+    for suffix in TEMPLATE_SUFFIX:
+        if suffix in base_repo:
+            base_repo = base_repo.replace(suffix, '')
+    repo_name = f"{class_id}-{username}-{base_repo}"
 
     # 1. Create the repository in the organization
     #create_url = f"{base_url}/orgs/{org_name}/repos"

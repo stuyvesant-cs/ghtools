@@ -418,7 +418,7 @@ def main():
         and args.assignment_command == "create"):
         parse_assignment_args(args, parser)
 
-    print(args)
+    #print(args)
 
     load_dotenv()
     token_name = args.org.replace('-', '_').upper()+"_TOKEN"

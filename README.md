@@ -23,14 +23,6 @@ ghtool
 ```
 As of now, the `assignment`, `org` and `team` options have been folded into `ghtool`. `create_assignment` still works standalone as described via `python create_assignment.py`
 
-## create_assignment.py
-Usage: `python create_assignment.py [-h] [-f FILE | -i INDIVIDUAL INDIVIDUAL] org_name repo_name`
-
-Will create repositories forked off an assignment repository and invite students to have write access to the new fork.
-- This version assumes that the assignment template and the created student repositories are all in the same organization (`org_name`)
-- The `csv_file` assumes each line is the follwoing format: `PERIOD,GH_USERNAME` (e.g. `10,jonalf`). The created repositories will be named `PERIOD-GH_USERNAME`.
-- Assumes there is a file `.env` containing the appropriate github access token (see Tokens & Permissions below).
-
 ## ghtool.py
 Usage: `python ghtool.py assignment|org|team`
 - Assumes there is a file `.env` containing the appropriate github access token (see Tokens & Permissions below).
@@ -74,8 +66,13 @@ Usage `ghtool.py team users add -i USER TEAM | -f FILE ORG`
 - If `-i` flag is used, `USER` will be added to `TEAM`.
 - If `-f` flag is used, `FILE` will be parsed, assuming each line is formatted as `TEAM,USER`. The teams in the file do not need to be the same.
 
+## create_assignment.py
+Usage: `python create_assignment.py [-h] [-f FILE | -i INDIVIDUAL INDIVIDUAL] org_name repo_name`
 
-
+Will create repositories forked off an assignment repository and invite students to have write access to the new fork.
+- This version assumes that the assignment template and the created student repositories are all in the same organization (`org_name`)
+- The `csv_file` assumes each line is the follwoing format: `PERIOD,GH_USERNAME` (e.g. `10,jonalf`). The created repositories will be named `PERIOD-GH_USERNAME`.
+- Assumes there is a file `.env` containing the appropriate github access token (see Tokens & Permissions below).
 
 ## Tokens & Permissions
 ### Tokens

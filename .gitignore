@@ -9,3 +9,4 @@
 # Folders
 build/
 tmp/*
+__pycache__

@@ -118,7 +118,10 @@ def invite_user(org_name, base_repo, class_id, username, github_token):
         "X-GitHub-Api-Version": "2026-03-10"
     }
     base_url = "https://api.github.com"
-    repo_name = f"{class_id}-{username}-{base_repo.replace('-template', '')}"
+    for suffix in TEMPLATE_SUFFIX:
+        if suffix in base_repo:
+            base_repo = base_repo.replace(suffix, '')
+    repo_name = f"{class_id}-{username}-{base_repo}"
 
     # 2. Invite the user as a collaborator (push permission = editor)
     invite_url = f"{base_url}/repos/{org_name}/{repo_name}/collaborators/{username}"
@@ -129,7 +132,7 @@ def invite_user(org_name, base_repo, class_id, username, github_token):
     if invite_response.status_code in [201, 204]:
         print(f"\t ✅ [SUCCESS] Invited '{username}' to '{repo_name}'.")
     else:
-        print(f"\t ❌ [ERROR] Failed to invite {username}: {invite_response.json().get('message', 'Unknown error')}")
+        print(f"\t ❌ [ERROR] Failed to invite {username}: {invite_response.status_code}  {invite_response.json().get('message', 'Unknown error')}")
 
 if __name__ == "__main__":
 

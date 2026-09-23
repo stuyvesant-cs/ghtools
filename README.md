@@ -21,10 +21,10 @@ ghtool
         ├── add
         └── delete
 ```
-As of now, the `org` and `team` options have been folded into `ghtool`. `create_assignment` still works standalone as described.
+As of now, the `assignment`, `org` and `team` options have been folded into `ghtool`. `create_assignment` still works standalone as described via `python create_assignment.py`
 
 ## create_assignment.py
-Usage: `python org_add_users [-h] [-f FILE | -i INDIVIDUAL INDIVIDUAL] org_name repo_name`
+Usage: `python create_assignment.py [-h] [-f FILE | -i INDIVIDUAL INDIVIDUAL] org_name repo_name`
 
 Will create repositories forked off an assignment repository and invite students to have write access to the new fork.
 - This version assumes that the assignment template and the created student repositories are all in the same organization (`org_name`)

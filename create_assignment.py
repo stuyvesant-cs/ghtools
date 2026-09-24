@@ -8,19 +8,9 @@ import argparse
 
 TEMPLATE_SUFFIX = ['-template', '-base']
 
-def send_request(request_method, url_string, payload, token):
-    headers = {
-        "Authorization": f"token {token}",
-        "Accept": "application/vnd.github.v3+json",
-        "X-GitHub-Api-Version": "2026-03-10"
-    }
-    base_url = "https://api.github.com"
-
-    url = f'{base_url}{url_string}'
-    response = request_method(url, json=payload, headers=headers)
-    return response
-
 def assignment_operation(args):
+    if not args.use_template:
+        args.use_template = is_template(args.org, args.repo, args.token)
     if args.file:
         setup_repositories(args.file, args.org, args.repo, args.token, args.use_template)
     else:
@@ -30,22 +20,41 @@ def assignment_operation(args):
             create_fork(args.org, args.repo, args.period, args.user, args.token)
         invite_user(args.org, args.repo, args.period, args.user, args.token)
 
-def test_repo_access(org_name, base_repo, github_token):
+def send_request(request_method, url_string, payload, token):
     headers = {
-        "Authorization": f"token {github_token}",
+        "Authorization": f"token {token}",
         "Accept": "application/vnd.github.v3+json",
         "X-GitHub-Api-Version": "2026-03-10"
     }
-    # Test if the token can read the repo first
-    test_url = f"https://github.com/{org_name}/{base_repo}"
-    test_response = requests.get(test_url, headers=headers)
+    base_url = "https://api.github.com"
+
+    url = f'{base_url}{url_string}'
+
+    response = request_method(url, json=payload, headers=headers)
+    return response
+
+def test_repo_access(org_name, base_repo, github_token):
+
+    test_url = f'/repos/{org_name}/{base_repo}'
+    test_response = send_request(requests.get, test_url, {}, github_token)
 
     if test_response.status_code == 200:
         print("Authentication successful! The repo is visible.")
+        print(f'data:\n{test_response.json()}')
     elif test_response.status_code == 404:
         print("The repo cannot be found. Check your token permissions or repo spelling.")
     else:
         print(f"Error {test_response.status_code}: {test_response.text}")
+
+def is_template(org_name, base_repo, github_token):
+    test_url = f'/repos/{org_name}/{base_repo}'
+    test_response = send_request(requests.get, test_url, {}, github_token)
+
+
+    if test_response.status_code == 200:
+        return test_response.json().get('is_template')
+    else:
+        return False
 
 def setup_repositories(csv_file, org_name, base_repo, github_token, template=False):
     """
@@ -197,6 +206,8 @@ if __name__ == "__main__":
     parser.add_argument('org_name')
     parser.add_argument('repo_name')
 
+    parser.add_argument('-r', '--testing', action='store_true')
+
     args = parser.parse_args()
 
     organization = args.org_name
@@ -208,6 +219,13 @@ if __name__ == "__main__":
 
     if not token:
         print("Error: GITHUB_TOKEN environment variable is not set.")
+        sys.exit(1)
+    if not args.use_template:
+        args.use_template = is_template(organization, base_repo, token)
+
+    if args.testing:
+        test_repo_access(organization, base_repo, token)
+        #print(is_template(organization, base_repo, token))
         sys.exit(1)
 
     if not (args.file or args.individual):

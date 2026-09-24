@@ -1,7 +1,7 @@
 import argparse
-import manage_teams
-import manage_org
-import create_assignment
+from . import manage_teams
+from . import manage_org
+from . import create_assignment
 from dotenv import load_dotenv
 import os
 import sys
@@ -381,16 +381,17 @@ def create_parser():
         metavar="ARG",
         help="PERIOD USERNAME ORG when using -i; ORG when using -f")
 
-    team_create_parser.add_argument(
-        "org",
-        metavar="ORG",
-        help="GitHub organization")
-
     assignment_create_parser.add_argument(
         "repo",
         metavar="REPO",
         help="Repository name")
 
+    assignment_create_parser.add_argument(
+            '-t',
+            '--use-template',
+            action='store_true',
+            help='flag if ase repo is a template')
+    
     assignment_create_parser.set_defaults(func=create_assignment.assignment_operation)
 
     return parser

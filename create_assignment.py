@@ -77,10 +77,11 @@ def create_fork(org_name, base_repo, class_id, username, github_token):
     }
     base_url = "https://api.github.com"
 
+    repo_name = base_repo
     for suffix in TEMPLATE_SUFFIX:
         if suffix in base_repo:
-            base_repo = base_repo.replace(suffix, '')
-    repo_name = f"{class_id}-{username}-{base_repo}"
+            repo_name = base_repo.replace(suffix, '')
+    repo_name = f"{class_id}-{username}-{repo_name}"
 
     # 1. Create the repository in the organization
     #create_url = f"{base_url}/orgs/{org_name}/repos"
@@ -94,7 +95,7 @@ def create_fork(org_name, base_repo, class_id, username, github_token):
     create_response = requests.post(fork_url, json=payload, headers=headers)
 
     # print(f'payload: {payload}')
-    # print(f'url: {fork_url}')
+    #print(f'url: {fork_url}')
 
     if create_response.status_code == 202:
         print(f"\t ✅ [SUCCESS] Repository '{repo_name}' created.")
@@ -118,10 +119,12 @@ def invite_user(org_name, base_repo, class_id, username, github_token):
         "X-GitHub-Api-Version": "2026-03-10"
     }
     base_url = "https://api.github.com"
+
+    repo_name = base_repo
     for suffix in TEMPLATE_SUFFIX:
         if suffix in base_repo:
-            base_repo = base_repo.replace(suffix, '')
-    repo_name = f"{class_id}-{username}-{base_repo}"
+            repo_name = base_repo.replace(suffix, '')
+    repo_name = f"{class_id}-{username}-{repo_name}"
 
     # 2. Invite the user as a collaborator (push permission = editor)
     invite_url = f"{base_url}/repos/{org_name}/{repo_name}/collaborators/{username}"

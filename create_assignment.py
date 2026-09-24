@@ -1,4 +1,3 @@
-
 import csv
 import os
 import sys
@@ -9,11 +8,26 @@ import argparse
 
 TEMPLATE_SUFFIX = ['-template', '-base']
 
+def send_request(request_method, url_string, payload, token):
+    headers = {
+        "Authorization": f"token {token}",
+        "Accept": "application/vnd.github.v3+json",
+        "X-GitHub-Api-Version": "2026-03-10"
+    }
+    base_url = "https://api.github.com"
+
+    url = f'{base_url}{url_string}'
+    response = request_method(url, json=payload, headers=headers)
+    return response
+
 def assignment_operation(args):
     if args.file:
-        setup_repositories(args.file, args.org, args.repo, args.token)
+        setup_repositories(args.file, args.org, args.repo, args.token, args.use_template)
     else:
-        create_fork(args.org, args.repo, args.period, args.user, args.token)
+        if args.use_template:
+            crate_from_template(args.org, args.repo, args.period, args.user, args.token)
+        else:
+            create_fork(args.org, args.repo, args.period, args.user, args.token)
         invite_user(args.org, args.repo, args.period, args.user, args.token)
 
 def test_repo_access(org_name, base_repo, github_token):
@@ -33,7 +47,7 @@ def test_repo_access(org_name, base_repo, github_token):
     else:
         print(f"Error {test_response.status_code}: {test_response.text}")
 
-def setup_repositories(csv_file, org_name, base_repo, github_token):
+def setup_repositories(csv_file, org_name, base_repo, github_token, template=False):
     """
     Reads a CSV file and creates GitHub repositories in an organization,
     then invites the specified users as collaborators.
@@ -62,12 +76,46 @@ def setup_repositories(csv_file, org_name, base_repo, github_token):
             username = row[1].strip()
 
             print(f"Processing: {username}...")
-            fork_success = create_fork(org_name, base_repo, class_id, username, github_token)
+            fork_success = False
+            if template:
+                fork_success = crate_from_template(org_name, base_repo, class_id, username, github_token)
+            else:
+                fork_success = create_fork(org_name, base_repo, class_id, username, github_token)
 
             time.sleep(2)
 
             if  fork_success:
                 invite_user(org_name, base_repo, class_id, username, github_token)
+
+def crate_from_template(org_name, base_repo, class_id, username, github_token):
+
+    #create new repo name
+    repo_name = base_repo
+    for suffix in TEMPLATE_SUFFIX:
+        if suffix in base_repo:
+            repo_name = base_repo.replace(suffix, '')
+    repo_name = f"{class_id}-{username}-{repo_name}"
+
+    create_url = f"/repos/{org_name}/{base_repo}/generate"
+    payload = {
+        "owner": org_name,
+        "name": repo_name,
+        "include_all_branches": False,
+        "private": True
+    }
+    create_response = send_request(requests.post, create_url, payload, github_token)
+
+    if create_response.status_code == 201:
+        print(f"\t ✅ [SUCCESS] Repository '{repo_name}' created.")
+        return True
+    elif create_response.status_code == 422:
+        print(f"\t ❌ [SKIP] Repository '{repo_name}' already exists or invalid name.")
+        return True
+    else:
+        error_msg = create_response.json().get('message', 'Unknown error')
+        print(f"\t ❌ [ERROR] Failed to create repo: {create_response.status_code} {error_msg}")
+        return False
+
 
 def create_fork(org_name, base_repo, class_id, username, github_token):
     headers = {
@@ -145,6 +193,7 @@ if __name__ == "__main__":
     arg_group = parser.add_mutually_exclusive_group()
     arg_group.add_argument('-f', '--file')
     arg_group.add_argument('-i', '--individual', nargs=2)
+    parser.add_argument('-t', '--use-template', action='store_true')
     parser.add_argument('org_name')
     parser.add_argument('repo_name')
 
@@ -166,10 +215,13 @@ if __name__ == "__main__":
         sys.exit(1)
     elif args.file:
         csv_path = args.file
-        setup_repositories(csv_path, organization, base_repo, token)
+        setup_repositories(csv_path, organization, base_repo, token, args.use_template)
     elif args.individual:
         username = args.individual[1]
         period = args.individual[0]
-        create_fork(organization, base_repo, period, username, token)
+        if args.use_template:
+            crate_from_template(organization, base_repo, period, username, token)
+        else:
+            create_fork(organization, base_repo, period, username, token)
         invite_user(organization, base_repo, period, username, token)
         #add_user(username, organization, token)

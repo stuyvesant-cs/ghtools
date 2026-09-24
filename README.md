@@ -1,6 +1,10 @@
 # ghtools
 Command line utilities to help replace some of the lost features of GitHub Classroom.
 
+# Now with pip!
+The full `ghtool` version of the program is now installable via `pip` from the `ghtool_project` directory.
+- To install: run `$ pip install -e .` from `ghtool_project/`
+- To run: `$ ghtool`
 
 # INPUT MODIFICATION CURRENTLY IN PROGRESS.
 Moving to a different style of program invocation, in order to combine these tools under one umbrella. This is the desired end goal:

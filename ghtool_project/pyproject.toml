@@ -12,7 +12,8 @@
     dependencies = [
         # Add any libraries your script uses here, e.g.:
         "requests",
-        "python-dotenv"
+        "python-dotenv",
+        "argparse"
     ]
     readme = "README.md"
     requires-python = ">=3.10"

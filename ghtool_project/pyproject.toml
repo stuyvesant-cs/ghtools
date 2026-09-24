@@ -1,0 +1,21 @@
+[build-system]
+    requires = ["setuptools>=61.0"]
+    build-backend = "setuptools.build_meta"
+
+[project]
+    name = "ghtool"
+    version = "0.5.0"
+    description = "GitHub Classroom-like utilities"
+    authors = [
+        {name = "JonAlf Dyrland-Weaver", email = "dw@stuy.edu"},
+    ]
+    dependencies = [
+        # Add any libraries your script uses here, e.g.:
+        "requests",
+        "python-dotenv"
+    ]
+    readme = "README.md"
+    requires-python = ">=3.10"
+
+[project.scripts]
+    ghtool = "ghtool.cli:main"

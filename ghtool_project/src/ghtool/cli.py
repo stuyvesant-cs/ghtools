@@ -1,7 +1,7 @@
 import argparse
-from . import manage_teams
-from . import manage_org
-from . import create_assignment
+import manage_teams
+import manage_org
+import create_assignment
 from dotenv import load_dotenv
 import os
 import sys

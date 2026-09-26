@@ -8,5 +8,5 @@
 
 # Folders
 build/
-tmp/*
-*__pycache__/*
+tmp/
+__pycache__/

@@ -68,34 +68,3 @@ def add_user(username, org_name, github_token):
     else:
         error_msg = response.json().get('message', 'Unknown error')
         print(f"\t ❌ [ERROR] Failed to add user: {error_msg}\n\t{response.json()}")
-
-
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(
-                    prog='org_add_users',
-                    description='Add users to a GitHub Organization')
-    arg_group = parser.add_mutually_exclusive_group()
-    arg_group.add_argument('-f', '--file')
-    arg_group.add_argument('-i', '--individual')
-    parser.add_argument('org_name')
-
-    args = parser.parse_args()
-    organization = args.org_name
-
-    load_dotenv()
-    token_name = organization.replace('-', '_').upper()+"_TOKEN"
-    token = os.getenv(token_name)
-
-    if not token:
-        print("Error: GITHUB_TOKEN environment variable is not set.")
-        sys.exit(1)
-
-    if not (args.file or args.individual):
-        print('please provide -f or -i option')
-        sys.exit(1)
-    elif args.file:
-        csv_path = args.file
-        add_users(csv_path, organization, token)
-    elif args.individual:
-        username = args.individual
-        add_user(username, organization, token)

@@ -10,3 +10,4 @@
 build/
 tmp/
 __pycache__/
+ghtool.egg-info/

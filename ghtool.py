@@ -1,6 +1,7 @@
 import argparse
 import manage_teams
 import manage_org
+import manage_repos
 import create_assignment
 from dotenv import load_dotenv
 import os
@@ -390,10 +391,56 @@ def create_parser():
             '-t',
             '--use-template',
             action='store_true',
-            help='flag if ase repo is a template')
-    
+            help='flag if base repo is a template')
+
     assignment_create_parser.set_defaults(func=create_assignment.assignment_operation)
 
+    # =========================================================
+    # REPOS - IN PROGRESS
+    # =========================================================
+    repo_parser = top_subparsers.add_parser(
+        "repo",
+        help="Repo clone opperations")
+
+    repo_subparsers = repo_parser.add_subparsers(
+        dest="repo_command",
+        required=True)
+
+    # ---------------------------------------------------------
+    # REPO CLONE
+    # ---------------------------------------------------------
+    repo_clone_parser = repo_subparsers.add_parser(
+        "clone",
+        help="Clone all assignment repos")
+
+    repo_clone_parser.add_argument(
+        "assignment",
+        metavar="ASSIGNMENT",
+        help="Assignment name from base directory (i.e. work, l00-gird...)")
+
+    repo_clone_parser.add_argument(
+        "org",
+        metavar="ORG",
+        help="Organization name")
+
+    repo_clone_parser.add_argument(
+            'user_file',
+            metavar='USER_FILE',
+            help='File of gh_usernames,dir_names')
+
+    repo_clone_parser.add_argument(
+            '-d',
+            '--target-dir',
+            metavar="TARGET_DIR",
+            help='Directory to clone repos into')
+
+    repo_clone_parser.add_argument(
+            '-s',
+            '--make-subdirs',
+            action='store_true',
+            help='Flag to create class identifer subdirectores')
+
+    repo_clone_parser.set_defaults(func=manage_repos.repo_operations)
     return parser
 
 

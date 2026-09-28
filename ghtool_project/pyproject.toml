@@ -4,7 +4,7 @@
 
 [project]
     name = "ghtool"
-    version = "0.7.1"
+    version = "0.7.2"
     description = "GitHub Classroom-like utilities"
     authors = [
         {name = "JonAlf Dyrland-Weaver", email = "dw@stuy.edu"},

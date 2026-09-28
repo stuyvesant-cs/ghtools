@@ -15,6 +15,8 @@ ghtool
 ├── org
 │   └── users
 │       └── add
+├── repo
+│   └── clone
 └── team
     ├── create
     ├── delete
@@ -25,10 +27,9 @@ ghtool
         ├── add
         └── delete
 ```
-As of now, the `assignment`, `org` and `team` options have been folded into `ghtool`. `create_assignment` still works standalone as described via `python create_assignment.py`
 
 ## ghtool.py
-Usage: `python ghtool.py assignment|org|team`
+Usage: `python ghtool.py assignment|org|repo|team`
 - Assumes there is a file `.env` containing the appropriate github access token (see Tokens & Permissions below).
 
 ### `ghtool.py assignment`
@@ -37,6 +38,13 @@ Actions: `create [-i PERIOD USER | -f FILE] org_name base_repo`
 - Assumes that the assignment template and the created student repositories are all in the same organization (`org_name`)
 - The `csv_file` assumes each line is the follwoing format: `PERIOD,GH_USERNAME` (e.g. `10,jonalf`). The created repositories will be named `PERIOD-GH_USERNAME`.
 
+### `ghtool repo`
+Actions: `clone [-d TARGET_DIR] [-s] ASSIGNMENT ORG USER_FILE`
+- Will clone repos if they were made by ghtool.
+- `USER_FILE` should be a csv of the form:  `gh_username,dirname`
+- The repos will be cloned to `ASSIGNMENT/dirname`.
+- `-d` provides an optional directory to store the cloned repos in (default is current directory).
+- `-s` Will add the class identifier subdirectory below `ASSIGNMENT/` (`ASSIGNMENT/class_id/dirname`)
 
 ### `ghtool.py org`
 Actions: `users add [-i USER | -f FILE] org_name`

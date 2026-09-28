@@ -3,9 +3,9 @@ import subprocess
 import os
 
 #only needed for testing
-import sys
-import argparse
-from dotenv import load_dotenv
+# import sys
+# import argparse
+# from dotenv import load_dotenv
 
 def send_request(request_method, url_string, payload, params, token):
     headers = {
@@ -124,19 +124,3 @@ def test_setup(org):
     token_name = org.replace('-', '_').upper()+"_TOKEN"
     token = os.getenv(token_name)
     return token
-
-if __name__ == '__main__':
-    import argparse
-    parser = argparse.ArgumentParser()
-    parser.add_argument('org')
-
-    args = parser.parse_args()
-    load_dotenv()
-    token_name = args.org.replace('-', '_').upper()+"_TOKEN"
-    token = os.getenv(token_name)
-    if not token:
-        print("Error: GITHUB_TOKEN environment variable is not set.")
-        sys.exit(1)
-    args.token = token
-
-    get_all_repos(args.org, args.token)

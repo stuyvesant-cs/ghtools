@@ -60,11 +60,14 @@ def clone_all_assignment_repos(assignment_name, assignment_repos, userfile, make
                 os.mkdir(clone_dir)
 
         user = repo['username']
-        
+
         if user in users:
             clone_path = f'{clone_dir}/{users[user]}'
             print(f'\ncloning: {repo['ssh_link']}')
-            subprocess.run(["git", "clone", repo['ssh_link'], clone_path], check=True)
+            try:
+                subprocess.run(["git", "clone", repo['ssh_link'], clone_path], check=True)
+            except subprocess.CalledProcessError:
+                print(f'❌ [ERROR] cloning: {repo['ssh_link']}')
         else:
             print(f'❌ [ERROR] {user} not in data file')
 

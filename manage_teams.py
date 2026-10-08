@@ -16,6 +16,7 @@ def send_request(request_method, url_string, payload, token):
     return response
 
 def user_operations(args):
+
     if args.users_command == 'add':
         if args.file:
             #print('file add users')
@@ -53,6 +54,11 @@ def modify_users(csv_file, org_name, token, remove=False):
                 add_user_to_team(username, org_name, team_name, token)
 
 def add_user_to_team(username, org_name, team_name, token):
+    #check for team:
+    if not check_for_team(org_name, team_name, token):
+        print(f'{team_name} does not exist, creating')
+        create_team(org_name, team_name, token)
+
     invite_url = f"/orgs/{org_name}/teams/{team_name}/memberships/{username}"
     payload = {
         'role': 'member'
@@ -75,10 +81,13 @@ def remove_user_from_team(username, org_name, team_name, token):
         error_msg = response.json().get('message', 'Unknown error')
         print(f"❌ [ERROR] Failed to remove {username} {response.status_code} {error_msg}")
 
-def create_team(args):
-    org_name = args.org
-    team_name = args.team
-    token = args.token
+def team_operation(args):
+    if args.team_command == 'create':
+        create_team(args.org, args.team, args.token)
+    if args.team_command == 'delete':
+        remove_team(args.org, args.team, args.token)
+
+def create_team(org_name, team_name, token):
 
     create_url = f"/orgs/{org_name}/teams"
     payload = {
@@ -93,10 +102,7 @@ def create_team(args):
         error_msg = response.json().get('message', 'Unknown error')
         print(f"❌ [ERROR] Failed to create team: {response.status_code} {error_msg}")
 
-def remove_team(args):
-    org_name = args.org
-    team_name = args.team
-    token = args.token
+def remove_team(org_name, team_name, token):
 
     remove_url = f'/orgs/{org_name}/teams/{team_name}'
     response = send_request(requests.delete, remove_url, None, token)
@@ -106,6 +112,15 @@ def remove_team(args):
         error_msg = response.json().get('message', 'Unknown error')
         print(f"❌ [ERROR] Failed to remove {team_name} {response.status_code} {error_msg}")
 
+def check_for_team(org_name, team_name, token):
+
+    url = f'/orgs/{org_name}/teams/{team_name}'
+    response = send_request(requests.get, url, None, token)
+
+    if response.status_code == 200:
+        return True
+    else:
+        return False
 
 def repo_operations(args):
     if args.repos_command == 'add':

@@ -3,9 +3,9 @@ import subprocess
 import os
 
 #only needed for testing
-import sys
-import argparse
-from dotenv import load_dotenv
+# import sys
+# import argparse
+# from dotenv import load_dotenv
 
 def send_request(request_method, url_string, payload, params, token):
     headers = {
@@ -55,7 +55,7 @@ def clone_all_assignment_repos(assignment_name, assignment_repos, userfile, make
     clone_dir = base_dir
     for repo in assignment_repos:
         if make_subdirs:
-            clone_dir = f'{base_dir}/{repo['class_id']}'
+            clone_dir = f"{base_dir}/{repo['class_id']}"
             if not os.path.isdir(clone_dir):
                 os.mkdir(clone_dir)
 
@@ -63,11 +63,11 @@ def clone_all_assignment_repos(assignment_name, assignment_repos, userfile, make
 
         if user in users:
             clone_path = f'{clone_dir}/{users[user]}'
-            print(f'\ncloning: {repo['ssh_link']}')
+            print(f"\ncloning: {repo['ssh_link']}")
             try:
                 subprocess.run(["git", "clone", repo['ssh_link'], clone_path], check=True)
             except subprocess.CalledProcessError:
-                print(f'❌ [ERROR] cloning: {repo['ssh_link']}')
+                print(f"❌ [ERROR] cloning: {repo['ssh_link']}")
         else:
             print(f'❌ [ERROR] {user} not in data file')
 
@@ -124,19 +124,3 @@ def test_setup(org):
     token_name = org.replace('-', '_').upper()+"_TOKEN"
     token = os.getenv(token_name)
     return token
-
-if __name__ == '__main__':
-    import argparse
-    parser = argparse.ArgumentParser()
-    parser.add_argument('org')
-
-    args = parser.parse_args()
-    load_dotenv()
-    token_name = args.org.replace('-', '_').upper()+"_TOKEN"
-    token = os.getenv(token_name)
-    if not token:
-        print("Error: GITHUB_TOKEN environment variable is not set.")
-        sys.exit(1)
-    args.token = token
-
-    get_all_repos(args.org, args.token)

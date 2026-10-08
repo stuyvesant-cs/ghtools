@@ -176,7 +176,7 @@ def create_parser():
         metavar="ORG",
         help="GitHub organization")
 
-    team_create_parser.set_defaults(func=manage_teams.create_team)
+    team_create_parser.set_defaults(func=manage_teams.team_operation)
 
     # ---------------------------------------------------------
     # TEAM DELETE - DONE
@@ -195,7 +195,7 @@ def create_parser():
         metavar="ORG",
         help="GitHub organization")
 
-    team_delete_parser.set_defaults(func=manage_teams.remove_team)
+    team_delete_parser.set_defaults(func=manage_teams.team_operation)
 
     # ---------------------------------------------------------
     # TEAM USERS
@@ -290,6 +290,12 @@ def create_parser():
         "add",
         help="Add a team to a repo")
 
+    team_repos_add_parser.add_argument(
+            '-w',
+            '--write',
+            action='store_true',
+            help='flag if to provide write access')
+    
     team_repos_add_input = (
         team_repos_add_parser.add_mutually_exclusive_group(
             required=True))

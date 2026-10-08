@@ -126,10 +126,10 @@ def repo_operations(args):
     if args.repos_command == 'add':
         if args.file:
             #print('file add users')
-            modify_repos(args.file, args.org, args.token)
+            modify_repos(args.file, args.org, args.token, False, args.write)
         else:
             #print('individual add user')
-            add_repo_to_team(args.repo, args.org, args.team, args.token)
+            add_repo_to_team(args.repo, args.org, args.team, args.token, args.write)
     else:
         if args.file:
             #print('file remove users')
@@ -138,7 +138,7 @@ def repo_operations(args):
             #print('individual remove user')
             remove_repo_from_team(args.repo, args.org, args.team, args.token)
 
-def modify_repos(csv_file, org_name, token, remove=False):
+def modify_repos(csv_file, org_name, token, remove=False, write=False):
     if not os.path.exists(csv_file):
         print(f"Error: File '{csv_file}' not found.")
         return
@@ -157,9 +157,12 @@ def modify_repos(csv_file, org_name, token, remove=False):
             if remove:
                 remove_repo_from_team(repo_name, org_name, team_name, token)
             else:
-                add_repo_to_team(repo_name, org_name, team_name,token)
+                add_repo_to_team(repo_name, org_name, team_name,token, write)
 
-def add_repo_to_team(repo_name, org_name, team_name, token, permission='pull'):
+def add_repo_to_team(repo_name, org_name, team_name, token, write=False):
+    permission = 'pull'
+    if write:
+        permission = 'push'
     invite_url = f"/orgs/{org_name}/teams/{team_name}/repos/{org_name}/{repo_name}"
     payload = {
         'permission': permission

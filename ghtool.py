@@ -290,6 +290,12 @@ def create_parser():
         "add",
         help="Add a team to a repo")
 
+    team_repos_add_parser.add_argument(
+            '-w',
+            '--write',
+            action='store_true',
+            help='flag if to provide write access')
+    
     team_repos_add_input = (
         team_repos_add_parser.add_mutually_exclusive_group(
             required=True))

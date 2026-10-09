@@ -12,7 +12,16 @@ def send_request(request_method, url_string, payload, token):
     base_url = "https://api.github.com"
 
     url = f'{base_url}{url_string}'
-    response = request_method(url, json=payload, headers=headers)
+
+    while (True):
+        response = request_method(url, json=payload, headers=headers)
+        if response.status_code == 429:
+            # Check for Retry-After header first
+            wait_time = int(response.headers.get("Retry-After", 60))
+            print(f"\tRate limited. Sleeping for {wait_time} seconds...")
+            time.sleep(wait_time)
+        else:
+            break
     return response
 
 def user_operations(args):

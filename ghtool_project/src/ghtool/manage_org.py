@@ -14,6 +14,26 @@ def org_operation(args):
         else:
             add_user(args.username, args.org, args.token)
 
+def send_request(request_method, url_string, payload, token):
+    headers = {
+        "Authorization": f"token {token}",
+        "Accept": "application/vnd.github.v3+json",
+        "X-GitHub-Api-Version": "2026-03-10"
+    }
+    base_url = "https://api.github.com"
+
+    url = f'{base_url}{url_string}'
+    while (True):
+        response = request_method(url, json=payload, headers=headers)
+        if response.status_code == 429:
+            # Check for Retry-After header first
+            wait_time = int(response.headers.get("Retry-After", 60))
+            print(f"\tRate limited. Sleeping for {wait_time} seconds...")
+            time.sleep(wait_time)
+        else:
+            break
+    return response
+
 def add_users(csv_file, org_name, github_token):
 
     if not os.path.exists(csv_file):
@@ -38,31 +58,32 @@ def add_users(csv_file, org_name, github_token):
 
 def add_user(username, org_name, github_token):
 
-    headers = {
-        "Authorization": f"token {github_token}",
-        "Accept": "application/vnd.github.v3+json",
-        "X-GitHub-Api-Version": "2026-03-10"
-    }
-    base_url = "https://api.github.com"
+    # headers = {
+    #     "Authorization": f"token {github_token}",
+    #     "Accept": "application/vnd.github.v3+json",
+    #     "X-GitHub-Api-Version": "2026-03-10"
+    # }
+    # base_url = "https://api.github.com"
 
     user_id = 0
     #step 0: get users github ID (a number)
-    lookup_url = f'{base_url}/users/{username}'
-    response = requests.get(lookup_url, headers=headers)
+    lookup_url = f'/users/{username}'
+    #response = requests.get(lookup_url, headers=headers)
+    response = send_request(requests.get, lookup_url, None, github_token)
     if response.status_code == 200:
         user_id = response.json()['id']
-
     if response.status_code == 404:
         print(f"{username}: GitHub user not found")
+        return
 
-    invite_url = f"{base_url}/orgs/{org_name}/invitations"
+    invite_url = f"/orgs/{org_name}/invitations"
     payload = {
         'invitee_id': user_id,
         "role": "direct_member"
     }
 
-    response = requests.post(invite_url, json=payload, headers=headers)
-
+    response = send_request(requests.post, invite_url, payload, github_token)
+    
     if response.status_code == 201:
         print(f"\t ✅ [SUCCESS] {username} invited.")
     else:

@@ -71,6 +71,7 @@ Usage `ghtool.py team repos add [-w] (-i REPO TEAM | -f FILE) ORG`
 - If `-f` flag is used, `FILE` will be parsed, assuming each line is formatted as `TEAM,REPO`. The teams in the file do not need to be the same.
 - The `-w` flag only works for the `add` action. If present, it will give __push__ access.
 - If a team already has access to a repository, the `add` action can be used to swap between push and pull access.
+- 
 
 #### `users`
 Usage `ghtool.py team users add -i USER TEAM | -f FILE ORG`

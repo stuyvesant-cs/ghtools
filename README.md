@@ -5,6 +5,7 @@ Command line utilities to help replace some of the lost features of GitHub Class
 The full `ghtool` version of the program is now installable via `pip` from the `ghtool_project` directory.
 - To install: run `$ pip install -e .` from `ghtool_project/`
 - To run: `$ ghtool`
+- You can still run the command from this directory with `python ghtool.py ...`
 
 # CLI Input Schema.
 ```
@@ -37,7 +38,7 @@ Usage: `python ghtool.py assignment|org|repo|team`
 Actions: `create (-i CLASS_ID GH_USERNAME | -f FILE) org_name base_repo`
 - Will create repositories based on `base_repo` and invite students to have write access to the new repository.
 - If `base_repo` is a Template repository, the new repos will be made from that template.
-- If `base_repo` is a regular Repository, the new repos will be _forks_ of `base_repo`. 
+- If `base_repo` is a regular Repository, the new repos will be _forks_ of `base_repo`.
 - Assumes that the assignment base and the created student repositories are all in the same organization (`org_name`)
 - The created repositories will be named `CLASS_ID-GH_USERNAME-ASSIGNMENT` (e.g. `10-jonalf-lab0`).
 - `ASSIGNMENT` will be the nave of the `base-repo`. If `base-repo` ends in `-base` or `-template`, those strings will not be included.

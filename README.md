@@ -35,7 +35,9 @@ Usage: `python ghtool.py assignment|org|repo|team`
 
 ### `ghtool.py assignment`
 Actions: `create (-i CLASS_ID GH_USERNAME | -f FILE) org_name base_repo`
-- Will create repositories forked off `base_repo` and invite students to have write access to the new fork.
+- Will create repositories based on `base_repo` and invite students to have write access to the new repository.
+- If `base_repo` is a Template repository, the new repos will be made from that template.
+- If `base_repo` is a regular Repository, the new repos will be _forks_ of `base_repo`. 
 - Assumes that the assignment base and the created student repositories are all in the same organization (`org_name`)
 - The created repositories will be named `CLASS_ID-GH_USERNAME-ASSIGNMENT` (e.g. `10-jonalf-lab0`).
 - `ASSIGNMENT` will be the nave of the `base-repo`. If `base-repo` ends in `-base` or `-template`, those strings will not be included.
@@ -75,7 +77,7 @@ Usage: `ghtool.py team repos add [-w] (-i REPO TEAM | -f FILE) ORG`
 - If `-f` flag is used, `FILE` will be parsed, assuming each line is formatted as `TEAM,REPO`. The teams in the file do not need to be the same.
 - The `-w` flag only works for the `add` action. If present, it will give __push__ access.
 - If a team already has access to a repository, the `add` action can be used to swap between push and pull access.
--
+
 
 #### `users`
 Usage `ghtool.py team users add (-i USER TEAM | -f FILE) ORG`

@@ -114,3 +114,7 @@ There are two places where you need to ensure permissions are correct:
   - Under Settings --> General --> Features
     - Select **Allow forking**
   - If you want the student repositories to be private, the template repository must be private as well.
+
+## AI Usage
+- Gemini and ChatGPT were initially consulted to help determine the initial direction to go (i.e. using the GH python module or REST API with requests). At this point, almost none of the AI provided code is still present in the files that handle the requests to GitHub.
+- ChatGPT provided the initial chunk of the command line parsing code, present in `cli.py`. That code is still largely intact, forming the parsing for the `assignment` and `org` actions.

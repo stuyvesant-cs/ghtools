@@ -27,6 +27,14 @@ ghtool
         ├── add
         └── delete
 ```
+## Data file:
+The `assignment`, `org`, and `repo` actions have been modified to use a standard csv format when using the `-f` flag. The file should have the following header row:
+- `class_id,gh_id,name`
+  - `class_id`: Identifier to separate classes (for example a period).
+  - `gh_id`: Student's GitHub username
+  - `name`: Identifier used to name local clones of repositories.
+  - e.g: `10,stuydw,dyrland-weaver.jonalf`
+Not all 3 entries are needed for all the actions, for example the `assignment create` action does not use the `name` field, so it can be left off.
 
 ## ghtool.py
 Usage: `python ghtool.py assignment|org|repo|team`
@@ -42,7 +50,7 @@ Actions: `create (-i CLASS_ID GH_USERNAME | -f FILE) org_name base_repo`
 - Assumes that the assignment base and the created student repositories are all in the same organization (`org_name`)
 - The created repositories will be named `CLASS_ID-GH_USERNAME-ASSIGNMENT` (e.g. `10-jonalf-lab0`).
 - `ASSIGNMENT` will be the nave of the `base-repo`. If `base-repo` ends in `-base` or `-template`, those strings will not be included.
-- The `csv_file` assumes each line is the following format: `CLASS_ID,GH_USERNAME` (e.g. `10,jonalf`).
+- The `csv_file` assumes each line is the following format: `class_id,gh_id` (e.g. `10,jonalf`).
 
 
 ### `ghtool repo`

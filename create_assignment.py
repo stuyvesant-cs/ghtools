@@ -2,9 +2,7 @@ import csv
 import os
 import sys
 import requests
-from dotenv import load_dotenv
 import time
-import argparse
 
 TEMPLATE_SUFFIX = ['-template', '-base']
 
@@ -81,15 +79,18 @@ def setup_repositories(csv_file, org_name, base_repo, github_token, template=Fal
 
 
     with open(csv_file, mode='r', encoding='utf-8') as f:
-        reader = csv.reader(f)
+        #reader = csv.reader(f)
+        reader = csv.DictReader(f)
         for row in reader:
 
-            if not row or len(row) < 2:
+            # if not row or len(row) < 2:
+            #     print(f'Invalid row: {row}')
+            #     continue
+            if 'class_id' not in row or 'gh_id' not in row:
                 print(f'Invalid row: {row}')
                 continue
-
-            class_id = row[0].strip()
-            username = row[1].strip()
+            class_id = row['class_id']
+            username = row['gh_id']
 
             print(f"Processing: {username}...")
             fork_success = False

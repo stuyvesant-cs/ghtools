@@ -1,11 +1,7 @@
 import requests
 import subprocess
 import os
-
-#only needed for testing
-# import sys
-# import argparse
-# from dotenv import load_dotenv
+import csv
 
 def send_request(request_method, url_string, payload, params, token):
     headers = {
@@ -42,15 +38,18 @@ def clone_all_assignment_repos(assignment_name, assignment_repos, userfile, make
     if not os.path.exists(userfile):
         print(f"Error: File '{userfile}' not found.")
         return
-    usertext = open(userfile).read().strip().split()
+    #usertext = open(userfile).read().strip().split()
     users = {}
-    for user in usertext:
-        #print(user)
-        ul = user.split(',')
-        if len(ul) != 2:
-            print(f'\tinvalid row: {user}')
-        else:
-            users[ul[0]] = ul[1]
+    with open(userfile, mode='r', encoding='utf-8') as f:
+        #reader = csv.reader(f)
+        reader = csv.DictReader(f)
+
+        for row in reader:
+            #print(user)
+            if 'gh_id' not in row or 'name' not in row:
+                print(f'\tinvalid row: {row}')
+            else:
+                users[row['gh_id']] = row['name']
 
     if base_dir[-1] != '/':
         base_dir+= '/'

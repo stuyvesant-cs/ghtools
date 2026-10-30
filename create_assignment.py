@@ -4,13 +4,15 @@ import sys
 import requests
 import time
 
+from manage_teams import add_repo_to_team
+
 TEMPLATE_SUFFIX = ['-template', '-base']
 
 def assignment_operation(args):
     if not args.use_template:
         args.use_template = is_template(args.org, args.repo, args.token)
     if args.file:
-        setup_repositories(args.file, args.org, args.repo, args.token, args.use_template)
+        setup_repositories(args.file, args.org, args.repo, args.token, args.use_template, args.add_team)
     else:
         if args.use_template:
             crate_from_template(args.org, args.repo, args.period, args.user, args.token)
@@ -61,17 +63,11 @@ def is_template(org_name, base_repo, github_token):
     else:
         return False
 
-def setup_repositories(csv_file, org_name, base_repo, github_token, template=False):
+def setup_repositories(csv_file, org_name, base_repo, github_token, template=False, team_add=False):
     """
     Reads a CSV file and creates GitHub repositories in an organization,
     then invites the specified users as collaborators.
     """
-    # headers = {
-    #     "Authorization": f"token {github_token}",
-    #     "Accept": "application/vnd.github.v3+json",
-    #     "X-GitHub-Api-Version": "2026-03-10"
-    # }
-    # base_url = "https://api.github.com"
 
     if not os.path.exists(csv_file):
         print(f"Error: File '{csv_file}' not found.")
@@ -83,9 +79,6 @@ def setup_repositories(csv_file, org_name, base_repo, github_token, template=Fal
         reader = csv.DictReader(f)
         for row in reader:
 
-            # if not row or len(row) < 2:
-            #     print(f'Invalid row: {row}')
-            #     continue
             if 'class_id' not in row or 'gh_id' not in row:
                 print(f'Invalid row: {row}')
                 continue
@@ -102,7 +95,14 @@ def setup_repositories(csv_file, org_name, base_repo, github_token, template=Fal
             time.sleep(2)
 
             if  fork_success:
-                invite_user(org_name, base_repo, class_id, username, github_token)
+                if not team_add:
+                    invite_user(org_name, base_repo, class_id, username, github_token)
+                else:
+                    for suffix in TEMPLATE_SUFFIX:
+                        if suffix in base_repo:
+                            repo_name = base_repo.replace(suffix, '')
+                    repo_name = f"{class_id}-{username}-{repo_name}"
+                    add_repo_to_team(repo_name, org_name, username, github_token, True)
 
 def crate_from_template(org_name, base_repo, class_id, username, github_token):
 
@@ -135,12 +135,6 @@ def crate_from_template(org_name, base_repo, class_id, username, github_token):
 
 
 def create_fork(org_name, base_repo, class_id, username, github_token):
-    # headers = {
-    #     "Authorization": f"token {github_token}",
-    #     "Accept": "application/vnd.github.v3+json",
-    #     "X-GitHub-Api-Version": "2026-03-10"
-    # }
-    # base_url = "https://api.github.com"
 
     repo_name = base_repo
     for suffix in TEMPLATE_SUFFIX:
@@ -177,12 +171,6 @@ def create_fork(org_name, base_repo, class_id, username, github_token):
         return False
 
 def invite_user(org_name, base_repo, class_id, username, github_token):
-    # headers = {
-    #     "Authorization": f"token {github_token}",
-    #     "Accept": "application/vnd.github.v3+json",
-    #     "X-GitHub-Api-Version": "2026-03-10"
-    # }
-    # base_url = "https://api.github.com"
 
     repo_name = base_repo
     for suffix in TEMPLATE_SUFFIX:

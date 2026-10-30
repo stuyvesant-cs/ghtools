@@ -43,14 +43,15 @@ Usage: `python ghtool.py assignment|org|repo|team`
 - The first thing to do is add all students to the organization (`ghtool org users add`). Students must __accept__ the invitation via GitHub before they can be added to repositories, teams, etc.
 
 ### `ghtool.py assignment`
-Actions: `create (-i CLASS_ID GH_USERNAME | -f FILE) org_name base_repo`
+Actions: `create (-i CLASS_ID GH_USERNAME | -f FILE) [-t] [-p] org_name base_repo`
 - Will create repositories based on `base_repo` and invite students to have write access to the new repository.
-- If `base_repo` is a Template repository, the new repos will be made from that template.
+- If `base_repo` is a Template repository, the new repos will be made from that template (this can be manually triggered with the `-p` flag).
 - If `base_repo` is a regular Repository, the new repos will be _forks_ of `base_repo`.
 - Assumes that the assignment base and the created student repositories are all in the same organization (`org_name`)
 - The created repositories will be named `CLASS_ID-GH_USERNAME-ASSIGNMENT` (e.g. `10-jonalf-lab0`).
 - `ASSIGNMENT` will be the nave of the `base-repo`. If `base-repo` ends in `-base` or `-template`, those strings will not be included.
 - The `csv_file` assumes each line is the following format: `class_id,gh_id` (e.g. `10,jonalf`).
+- If the `-t` flag is used, then the `gh_id` column of the data file will be interpreted as a __team__ name instead of an individual github user. The team will be given write access to the repository.
 
 
 ### `ghtool repo`

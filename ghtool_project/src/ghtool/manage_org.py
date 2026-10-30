@@ -2,9 +2,7 @@ import csv
 import os
 import sys
 import requests
-from dotenv import load_dotenv
 import time
-import argparse
 
 def org_operation(args):
     #print(args)
@@ -41,15 +39,17 @@ def add_users(csv_file, org_name, github_token):
         return
 
     with open(csv_file, mode='r', encoding='utf-8') as f:
-        reader = csv.reader(f)
+        #reader = csv.reader(f)
+        reader = csv.DictReader(f)
         for row in reader:
 
-            if not row or len(row) < 2:
+            #if not row or len(row) < 2:
+            if 'gh_id' not in row:
                 print(f'Invalid row: {row}')
                 continue
 
             #class_id = row[0].strip()
-            username = row[1].strip()
+            username = row['gh_id']
             #user_id = 0
 
             print(f"Processing: {username}...")
@@ -83,7 +83,7 @@ def add_user(username, org_name, github_token):
     }
 
     response = send_request(requests.post, invite_url, payload, github_token)
-    
+
     if response.status_code == 201:
         print(f"\t ✅ [SUCCESS] {username} invited.")
     else:

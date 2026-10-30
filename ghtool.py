@@ -295,7 +295,7 @@ def create_parser():
             '--write',
             action='store_true',
             help='flag if to provide write access')
-    
+
     team_repos_add_input = (
         team_repos_add_parser.add_mutually_exclusive_group(
             required=True))
@@ -395,6 +395,12 @@ def create_parser():
 
     assignment_create_parser.add_argument(
             '-t',
+            '--add-team',
+            action='store_true',
+            help='flag to add team instead of user')
+
+    assignment_create_parser.add_argument(
+            '-p',
             '--use-template',
             action='store_true',
             help='flag if base repo is a template')

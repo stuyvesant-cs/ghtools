@@ -4,7 +4,7 @@ import sys
 import requests
 import time
 
-from manage_teams import add_repo_to_team
+from .manage_teams import add_repo_to_team
 
 TEMPLATE_SUFFIX = ['-template', '-base']
 

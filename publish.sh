@@ -9,3 +9,4 @@ sed -i '' 's/^import manage_org$/from . import manage_org/' ghtool_project/src/g
 sed -i '' 's/^import manage_teams$/from . import manage_teams/' ghtool_project/src/ghtool/cli.py
 sed -i '' 's/^import create_assignment$/from . import create_assignment/' ghtool_project/src/ghtool/cli.py
 sed -i '' 's/^import manage_repos$/from . import manage_repos/' ghtool_project/src/ghtool/cli.py
+sed -i '' 's/from manage_teams import add_repo_to_team/from .manage_teams import add_repo_to_team/g' ghtool_project/src/ghtool/create_assignment.py
